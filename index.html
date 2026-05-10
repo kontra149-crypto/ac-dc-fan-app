@@ -819,27 +819,30 @@ async function loadQuiz(){
   const pool=QUIZ_FALLBACK;
   renderQuiz(pool[Math.floor(Math.random()*pool.length)],false);
 }
+let currentQuizData=null;
 function renderQuiz(q,isAI){
+  currentQuizData=q;
   const card=document.getElementById('quiz-card');
   card.innerHTML=`
     ${isAI?`<div class="pill pill-red" style="margin-bottom:14px;font-size:9px">🤖 Claude KI</div>`:''}
     <p class="trivia-q">${q.q}</p>
     <div class="trivia-opts">
-      ${q.opts.map(o=>`<button class="trivia-opt" onclick="answerQuiz(this,'${o.replace(/'/g,"\\'").replace(/"/g,'&quot;')}',${JSON.stringify(JSON.stringify(q))})">${o}</button>`).join('')}
+      ${q.opts.map((o,i)=>`<button class="trivia-opt" data-idx="${i}" onclick="answerQuiz(this)">${o}</button>`).join('')}
     </div>`;
   document.getElementById('quiz-source').textContent=isAI?'⚡ Von Claude KI generiert':'⚡ Aus Archiv-Datenbank';
 }
-function answerQuiz(btn,answer,jsonStr){
+function answerQuiz(btn){
   if(quizAnswered)return;
   quizAnswered=true;
-  const q=JSON.parse(jsonStr);
+  const q=currentQuizData;
+  const answer=btn.textContent.trim();
   const correct=answer===q.correct;
   if(correct)triviaScore++;
   document.getElementById('score-val').textContent=triviaScore;
   document.querySelectorAll('.trivia-opt').forEach(b=>{
     if(b.textContent.trim()===q.correct)b.classList.add('correct');
     else if(b===btn&&!correct)b.classList.add('wrong');
-    else b.classList.add('dim');
+    else if(b.textContent.trim()!==q.correct)b.classList.add('dim');
     b.disabled=true;
   });
   const card=document.getElementById('quiz-card');
