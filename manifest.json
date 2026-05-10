@@ -1,0 +1,26 @@
+{
+  "name": "High Voltage – AC/DC Fan App",
+  "short_name": "High Voltage",
+  "description": "Die ultimative AC/DC Fan App",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e61e2a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "music"],
+  "lang": "de"
+}
