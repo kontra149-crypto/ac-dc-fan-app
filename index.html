@@ -108,26 +108,65 @@ body.light .btn-ghost{background:rgba(0,0,0,0.05)}
 
 /* ── HERO ── */
 .hero{
-  width:100%;min-height:200px;border-radius:20px;overflow:hidden;
+  width:100%;border-radius:20px;overflow:hidden;
   position:relative;border:1px solid var(--border);margin-bottom:18px;
-  display:flex;align-items:flex-end;padding:22px;
-  background:linear-gradient(135deg,#111 0%,#1a0808 100%);
+  display:flex;align-items:flex-end;padding:24px;
+  background:linear-gradient(160deg,#0a0a0a 0%,#1a0505 60%,#2a0808 100%);
+  min-height:220px;
 }
-.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,rgba(230,30,42,.25) 0%,transparent 60%)}
-.hero-lines{position:absolute;inset:0;opacity:.04;background:repeating-linear-gradient(0deg,transparent,transparent 2px,#fff 2px,#fff 3px)}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 75% 30%,rgba(230,30,42,.35) 0%,rgba(230,30,42,.05) 50%,transparent 70%)}
+.hero-glow2{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(230,30,42,.12) 0%,transparent 50%)}
+.hero-lines{position:absolute;inset:0;opacity:.03;background:repeating-linear-gradient(0deg,transparent,transparent 2px,#fff 2px,#fff 3px)}
+.hero-noise{position:absolute;inset:0;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+.hero-badge{position:absolute;top:16px;right:16px;background:rgba(230,30,42,.15);border:1px solid rgba(230,30,42,.3);border-radius:20px;padding:5px 12px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red)}
 .hero-content{position:relative;z-index:2}
-.hero h1{font-family:'Bebas Neue',sans-serif;font-size:58px;line-height:.85;letter-spacing:2px;margin-bottom:10px;text-shadow:0 2px 20px rgba(230,30,42,.4)}
-.hero p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;max-width:260px}
+.hero-eyebrow{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--red)}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;letter-spacing:2px;margin-bottom:12px;text-shadow:0 2px 30px rgba(230,30,42,.5)}
+.hero p{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6;max-width:270px}
 .hero-btns{display:flex;gap:8px;flex-wrap:wrap}
+.hero-rotate{position:absolute;right:-10px;bottom:-10px;font-family:'Bebas Neue',sans-serif;font-size:110px;line-height:1;color:rgba(255,255,255,.025);letter-spacing:-2px;pointer-events:none;z-index:1;user-select:none}
 
-/* ── NEWS ── */
+/* ── NEWS FILTER ── */
+.news-filter-bar{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.news-filter-bar::-webkit-scrollbar{display:none}
+.filter-pill{padding:7px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);white-space:nowrap;transition:all .2s;font-family:'Barlow Condensed',sans-serif}
+.filter-pill.active{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 12px var(--red-glow)}
+.filter-pill:active{transform:scale(.94)}
+body.light .filter-pill{background:rgba(0,0,0,.04)}
+
+/* ── NEWS CARDS ── */
 .news-card{cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.news-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(230,30,42,.04),transparent);opacity:0;transition:opacity .2s}
+.news-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(230,30,42,.05),transparent);opacity:0;transition:opacity .2s}
 .news-card:active{transform:scale(.98)}
 .news-card:active::before{opacity:1}
-.news-card h3{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1px;margin:8px 0 6px;line-height:1.05}
-.news-card p{font-size:12px;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.news-more{margin-top:10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:4px}
+.news-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.news-card h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin:0 0 7px;line-height:1.05}
+.news-card p{font-size:12px;color:var(--muted);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-card-featured{border-left:3px solid var(--red)}
+.news-card-featured h3{font-size:26px}
+.news-more{margin-top:12px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);display:flex;align-items:center;gap:5px}
+.news-more::after{content:'→';transition:transform .2s}
+.news-card:active .news-more::after{transform:translateX(4px)}
+
+/* ── PULL TO REFRESH ── */
+.ptr-indicator{height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:height .2s;color:var(--red);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;gap:8px;flex-shrink:0}
+.ptr-indicator.visible{height:48px}
+.ptr-spinner{font-size:18px;animation:spin .7s linear infinite}
+
+/* ── ARTICLE VIEW ── */
+.article-hero{width:100%;border-radius:14px;overflow:hidden;position:relative;margin-bottom:20px;background:linear-gradient(160deg,#0a0a0a,#1a0505);padding:28px 20px 20px;border:1px solid var(--border)}
+.article-hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(230,30,42,.2),transparent 60%)}
+.article-cat{position:relative;z-index:2;margin-bottom:12px}
+.article-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1.5px;line-height:1;position:relative;z-index:2;margin-bottom:8px}
+.article-meta{font-size:10px;color:var(--muted);letter-spacing:1px;position:relative;z-index:2}
+.article-body{font-size:14px;color:var(--muted);line-height:1.8;white-space:pre-line}
+.article-body p{margin-bottom:14px}
+.article-divider{height:1px;background:linear-gradient(90deg,var(--red),transparent);margin:20px 0;opacity:.4}
+.article-footer{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border)}
+.article-share{display:flex;gap:8px}
+.share-btn{padding:8px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-family:'Barlow Condensed',sans-serif;transition:all .2s}
+.share-btn:active{background:rgba(230,30,42,.1);border-color:rgba(230,30,42,.3);color:var(--red)}
 
 /* ── ALBUMS ── */
 .album-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -303,19 +342,31 @@ body.light .search-input{background:rgba(0,0,0,.04)}
 
   <!-- NEWS -->
   <div id="page-news" class="page active">
+    <!-- PULL TO REFRESH -->
+    <div class="ptr-indicator" id="ptr-indicator">
+      <span class="ptr-spinner">⚡</span>
+      <span id="ptr-text">Loslassen zum Aktualisieren</span>
+    </div>
+    <!-- HERO -->
     <div class="hero">
       <div class="hero-glow"></div>
+      <div class="hero-glow2"></div>
       <div class="hero-lines"></div>
+      <div class="hero-noise"></div>
+      <div class="hero-badge">⚡ Power Up Tour 2026</div>
+      <div class="hero-rotate">AC/DC</div>
       <div class="hero-content">
+        <div class="hero-eyebrow">Meistverkauftes Hardrock-Album</div>
         <h1>Back in<br>Black</h1>
-        <p>Über 40 Jahre – das meistverkaufte Hardrock-Album aller Zeiten.</p>
+        <p>50+ Millionen Einheiten — das Monument des Hard Rock. Brian Johnsons Einstieg für die Ewigkeit.</p>
         <div class="hero-btns">
           <button class="btn btn-red" onclick="openVideo('https://www.youtube.com/embed/pAgnJDJN4VA')">⚡ Video</button>
           <button class="btn btn-ghost" onclick="showTab('history')">Die Story</button>
         </div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <!-- HEADER + KI-UPDATE -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div>
         <div class="sec-title">News</div>
         <div class="sec-sub">⚡ Frontline Berichte</div>
@@ -323,6 +374,15 @@ body.light .search-input{background:rgba(0,0,0,.04)}
       <button class="btn btn-ghost" id="news-btn" onclick="loadNewsAI()" style="font-size:10px;padding:8px 14px">
         <span id="news-btn-icon">🤖</span> KI-Update
       </button>
+    </div>
+    <!-- FILTER BAR -->
+    <div class="news-filter-bar" id="news-filter-bar">
+      <button class="filter-pill active" data-cat="Alle" onclick="filterNews('Alle',this)">Alle</button>
+      <button class="filter-pill" data-cat="Live" onclick="filterNews('Live',this)">🎤 Live</button>
+      <button class="filter-pill" data-cat="Studio" onclick="filterNews('Studio',this)">🎛 Studio</button>
+      <button class="filter-pill" data-cat="Interview" onclick="filterNews('Interview',this)">🎙 Interview</button>
+      <button class="filter-pill" data-cat="Legacy" onclick="filterNews('Legacy',this)">🏆 Legacy</button>
+      <button class="filter-pill" data-cat="Merch" onclick="filterNews('Merch',this)">🛒 Merch</button>
     </div>
     <div id="news-status" style="margin-bottom:10px"></div>
     <div id="news-list"></div>
@@ -750,18 +810,41 @@ function closeVideo(){
 }
 
 // ── NEWS ────────────────────────────────────────────────
+let allNewsItems=[];
+let activeFilter='Alle';
+
 function renderNews(items){
-  document.getElementById('news-list').innerHTML=items.map(n=>`
-    <div class="card card-red news-card" onclick="openArticle(${JSON.stringify(JSON.stringify(n))})">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+  allNewsItems=items;
+  activeFilter='Alle';
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.toggle('active',p.dataset.cat==='Alle'));
+  renderNewsFiltered();
+  document.getElementById('news-dot').style.display='none';
+}
+
+function filterNews(cat,btn){
+  activeFilter=cat;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  renderNewsFiltered();
+}
+
+function renderNewsFiltered(){
+  const items=activeFilter==='Alle'?allNewsItems:allNewsItems.filter(n=>n.cat===activeFilter);
+  const list=document.getElementById('news-list');
+  if(!items.length){
+    list.innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--muted)"><div style="font-size:28px;margin-bottom:10px">📭</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px">Keine News in dieser Kategorie</div></div>`;
+    return;
+  }
+  list.innerHTML=items.map((n,i)=>`
+    <div class="card ${i===0?'card-red news-card-featured':''} news-card" onclick="openArticle(${JSON.stringify(JSON.stringify(n))})">
+      <div class="news-card-top">
         <span class="tag">${n.cat}</span>
         <span style="font-size:9px;color:var(--muted);font-style:italic">${n.date}</span>
       </div>
       <h3>${n.title}</h3>
       <p>${n.content}</p>
-      <div class="news-more">Weiterlesen →</div>
+      <div class="news-more">Weiterlesen</div>
     </div>`).join('');
-  document.getElementById('news-dot').style.display='none';
 }
 
 async function loadNewsAI(){
@@ -779,9 +862,9 @@ async function loadNewsAI(){
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:1000,
-        system:'Du bist ein AC/DC Nachrichtenredakteur. Antworte NUR mit einem JSON-Array ohne Backticks. 4 aktuelle News auf DEUTSCH für 2026. Format:[{"id":"n1","title":"...","date":"...","cat":"Live|Studio|Interview|Legacy|Merch","content":"2 Sätze","details":"2-3 Absätze"}]',
-        messages:[{role:'user',content:'4 aktuelle AC/DC News Mai 2026. Nur JSON-Array.'}]
+        model:'claude-sonnet-4-6',max_tokens:1200,
+        system:'Du bist ein AC/DC Nachrichtenredakteur. Antworte NUR mit einem JSON-Array ohne Backticks. 5 aktuelle News auf DEUTSCH für 2026, abwechslungsreiche Kategorien. Format:[{"id":"n1","title":"...","date":"Mai 2026","cat":"Live|Studio|Interview|Legacy|Merch","content":"2 prägnante Sätze","details":"3-4 Absätze mit Details, Hintergründen und Zitaten"}]',
+        messages:[{role:'user',content:'5 aktuelle AC/DC News Mai 2026, verschiedene Kategorien. Nur JSON-Array.'}]
       })
     });
     const data=await res.json();
@@ -804,18 +887,30 @@ function openArticle(jsonStr){
   const n=JSON.parse(jsonStr);
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-article').classList.add('active');
+  const catEmoji={Live:'🎤',Studio:'🎛',Interview:'🎙',Legacy:'🏆',Merch:'🛒'}[n.cat]||'⚡';
+  const paragraphs=(n.details||n.content).split('\n\n').filter(Boolean).map(p=>`<p>${p}</p>`).join('<div class="article-divider"></div>');
   document.getElementById('article-content').innerHTML=`
+    <div class="article-hero">
+      <div class="article-hero-glow"></div>
+      <div class="article-cat"><span class="tag">${catEmoji} ${n.cat}</span></div>
+      <div class="article-title">${n.title}</div>
+      <div class="article-meta">⚡ ${n.date} · High Voltage News Service</div>
+    </div>
     <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span class="tag">${n.cat}</span>
-        <span style="font-size:10px;color:var(--muted);font-style:italic">${n.date}</span>
-      </div>
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;margin-bottom:14px;line-height:1">${n.title}</h2>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;white-space:pre-line">${n.details||n.content}</p>
-      <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border)">
-        <span style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚡ High Voltage News Service</span>
+      <div class="article-body">${paragraphs}</div>
+      <div class="article-footer">
+        <span style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red)">⚡ High Voltage</span>
+        <div class="article-share">
+          <button class="share-btn" onclick="copyArticleLink('${n.title.replace(/'/g,"\\'")}')">📋 Kopieren</button>
+        </div>
       </div>
     </div>`;
+  document.getElementById('scroll-area').scrollTop=0;
+}
+function copyArticleLink(title){
+  navigator.clipboard?.writeText('AC/DC News: '+title+' – High Voltage App').then(()=>{
+    const btn=event.target;btn.textContent='✅ Kopiert!';setTimeout(()=>btn.textContent='📋 Kopieren',2000);
+  });
 }
 function closeArticle(){
   document.getElementById('page-article').classList.remove('active');
@@ -823,6 +918,29 @@ function closeArticle(){
   document.getElementById('bnav-news').classList.add('active');
   currentTab='news';
 }
+
+// ── PULL TO REFRESH ──────────────────────────────────────
+(function(){
+  const sa=document.getElementById('scroll-area');
+  let startY=0,pulling=false,threshold=80;
+  sa.addEventListener('touchstart',e=>{if(sa.scrollTop===0&&currentTab==='news')startY=e.touches[0].clientY;},{ passive:true });
+  sa.addEventListener('touchmove',e=>{
+    if(!startY)return;
+    const dy=e.touches[0].clientY-startY;
+    if(dy>10&&sa.scrollTop===0){
+      pulling=true;
+      const ind=document.getElementById('ptr-indicator');
+      ind.classList.add('visible');
+      document.getElementById('ptr-text').textContent=dy>threshold?'Loslassen zum Aktualisieren':'Ziehen zum Aktualisieren';
+    }
+  },{ passive:true });
+  sa.addEventListener('touchend',e=>{
+    const dy=e.changedTouches[0].clientY-startY;
+    if(pulling&&dy>threshold){loadNewsAI();}
+    document.getElementById('ptr-indicator').classList.remove('visible');
+    pulling=false;startY=0;
+  });
+})();
 
 // ── ALBUMS ──────────────────────────────────────────────
 function renderAlbums(){
