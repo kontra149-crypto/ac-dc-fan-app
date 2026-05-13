@@ -409,7 +409,7 @@ body.light .search-input{background:rgba(0,0,0,.04)}
     <div class="sec-title">World Tour</div>
     <div class="sec-sub">⚡ Power Up Tour 2024–2026</div>
     <div class="tour-map-wrap">
-      <canvas id="tour-canvas" style="width:100%;display:block"></canvas>
+      <div id="tour-canvas"></div>
     </div>
     <div style="display:flex;gap:16px;margin-bottom:14px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">
       <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;box-shadow:0 0 6px var(--red-glow)"></span>Upcoming</span>
@@ -1270,72 +1270,53 @@ const TOUR_VENUES=[
 ];
 
 function drawTourMap(){
-  const canvas=document.getElementById('tour-canvas');
-  if(!canvas)return;
-  const dpr=window.devicePixelRatio||1;
-  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||350;
-  const H=Math.round(W*0.56);
-  canvas.width=W*dpr;
-  canvas.height=H*dpr;
-  canvas.style.height=H+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.scale(dpr,dpr);
+  const wrap=document.getElementById('tour-canvas');
+  if(!wrap)return;
 
-  // Background
-  ctx.fillStyle='#1a2433';
-  ctx.fillRect(0,0,W,H);
+  const W=800, H=450;
 
-  // Simple world map silhouette (rough polygons for continents)
-  ctx.fillStyle='rgba(255,255,255,0.06)';
-  ctx.strokeStyle='rgba(255,255,255,0.1)';
-  ctx.lineWidth=0.5;
-
-  // Mercator projection
   function project(lat,lng){
-    const x=(lng+180)/(360)*W;
+    const x=(lng+180)/360*W;
     const latR=lat*Math.PI/180;
     const y=(Math.PI-Math.log(Math.tan(Math.PI/4+latR/2)))/(2*Math.PI)*H;
-    return[x,y];
+    return[Math.round(x*10)/10, Math.round(y*10)/10];
   }
 
   // Grid lines
-  ctx.strokeStyle='rgba(255,255,255,0.04)';
-  ctx.lineWidth=0.5;
+  let gridLines='';
   for(let lng=-180;lng<=180;lng+=30){
-    const[x1]=project(85,lng);
-    const[x2,y2]=project(-60,lng);
-    ctx.beginPath();ctx.moveTo(x1,project(85,lng)[1]);ctx.lineTo(x2,y2);ctx.stroke();
+    const[x1,y1]=project(80,lng);
+    const[x2,y2]=project(-55,lng);
+    gridLines+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
   }
-  for(let lat=-60;lat<=85;lat+=20){
-    ctx.beginPath();
-    for(let lng=-180;lng<=180;lng+=5){
-      const[x,y]=project(lat,lng);
-      lng===-180?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }
-    ctx.stroke();
+  for(let lat=-55;lat<=80;lat+=20){
+    let pts=[];
+    for(let lng=-180;lng<=180;lng+=5)pts.push(project(lat,lng).join(','));
+    gridLines+=`<polyline points="${pts.join(' ')}"/>`;
   }
 
-  // Draw venue dots
-  TOUR_VENUES.forEach(v=>{
+  // Venue dots
+  let dots='';
+  TOUR_VENUES.forEach((v,i)=>{
     const[x,y]=project(v.lat,v.lng);
-    const color=v.status==='upcoming'?'#e61e2a':v.status==='sold-out'?'#c8a84b':'rgba(255,255,255,0.35)';
-    // Glow for upcoming
+    const color=v.status==='upcoming'?'#e61e2a':v.status==='sold-out'?'#c8a84b':'rgba(255,255,255,0.4)';
+    const r=v.status==='upcoming'?6:4;
     if(v.status==='upcoming'){
-      const g=ctx.createRadialGradient(x,y,0,x,y,10);
-      g.addColorStop(0,'rgba(230,30,42,0.4)');
-      g.addColorStop(1,'transparent');
-      ctx.fillStyle=g;
-      ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();
+      dots+=`<circle cx="${x}" cy="${y}" r="14" fill="rgba(230,30,42,0.2)"/>`;
+      dots+=`<circle cx="${x}" cy="${y}" r="9" fill="rgba(230,30,42,0.15)"/>`;
     }
-    ctx.fillStyle=color;
-    ctx.beginPath();ctx.arc(x,y,v.status==='upcoming'?5:3.5,0,Math.PI*2);ctx.fill();
+    dots+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" ${v.status==='upcoming'?'filter="url(#glow)"':''}/>`;
   });
 
-  // Label
-  ctx.fillStyle='rgba(255,255,255,0.2)';
-  ctx.font='700 8px Barlow Condensed, sans-serif';
-  ctx.letterSpacing='2px';
-  ctx.fillText('POWER UP WORLD TOUR 2024–2026',10,H-10);
+  wrap.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;border-radius:12px">
+    <defs>
+      <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect width="${W}" height="${H}" fill="#1a2433" rx="12"/>
+    <g stroke="rgba(255,255,255,0.06)" stroke-width="0.5" fill="none">${gridLines}</g>
+    ${dots}
+    <text x="12" y="${H-12}" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="rgba(255,255,255,0.25)">POWER UP WORLD TOUR 2024–2026</text>
+  </svg>`;
 }
 
 function renderTourVenues(){
