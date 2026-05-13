@@ -282,8 +282,8 @@ body.light .search-input{background:rgba(0,0,0,.04)}
 .hs-me{border-color:rgba(230,30,42,.4);background:rgba(230,30,42,.04)}
 
 /* ── TOUR MAP ── */
-.tour-map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:14px;background:var(--surface2);position:relative}
-.tour-map-inner{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:#1a2433}
+.tour-map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:14px;background:#1a2433;position:relative;min-height:200px}
+.tour-map-wrap svg{display:block;width:100%}
 .tour-venue-list{display:flex;flex-direction:column;gap:8px}
 .tour-venue{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
 .tour-venue:active{background:var(--surface2);border-color:rgba(230,30,42,.3)}
@@ -771,7 +771,7 @@ function showTab(tab){
   if(tab==='history'&&!document.getElementById('timeline').innerHTML){renderHistory();renderConcerts();}
   if(tab==='quiz'&&!quizLoaded){loadQuiz();}
   if(tab==='wall'){renderWall();}
-  if(tab==='tour'){renderTourVenues();setTimeout(drawTourMap,80);}
+  if(tab==='tour'){renderTourVenues();drawTourMap();}
   if(tab==='highscore'){renderHighscores();}
 }
 
@@ -1273,49 +1273,72 @@ function drawTourMap(){
   const wrap=document.getElementById('tour-canvas');
   if(!wrap)return;
 
-  const W=800, H=450;
+  const W=800, H=420;
 
-  function project(lat,lng){
+  function px(lat,lng){
     const x=(lng+180)/360*W;
     const latR=lat*Math.PI/180;
     const y=(Math.PI-Math.log(Math.tan(Math.PI/4+latR/2)))/(2*Math.PI)*H;
-    return[Math.round(x*10)/10, Math.round(y*10)/10];
+    return[+x.toFixed(1), +y.toFixed(1)];
   }
 
-  // Grid lines
-  let gridLines='';
+  // Continent outlines (simplified polygons)
+  const continents=[
+    // Europe
+    [[71,28],[70,32],[69,18],[66,14],[64,5],[61,-2],[59,5],[58,11],[55,8],[54,10],[51,2],[48,-5],[44,0],[43,6],[41,12],[38,15],[37,14],[36,4],[36,-6],[38,-9],[42,-9],[44,-9],[47,-2],[48,2],[52,5],[53,9],[54,10],[57,12],[58,7],[60,5],[62,6],[63,8],[65,14],[68,18],[69,18],[71,28]],
+    // Scandinavia
+    [[71,28],[71,25],[70,20],[68,17],[65,14],[64,16],[63,20],[65,25],[68,28],[70,30],[71,28]],
+    // UK
+    [[58,-4],[57,-2],[53,-5],[50,-5],[51,1],[53,0],[56,-3],[58,-4]],
+    // Africa
+    [[37,10],[35,11],[32,32],[22,37],[12,43],[2,42],[-4,40],[-12,37],[-20,34],[-35,20],[-35,17],[-34,26],[-20,35],[-10,40],[0,42],[5,35],[15,37],[22,37],[32,32],[35,11],[37,10]],
+    // Asia (simplified)
+    [[70,30],[72,52],[71,68],[70,80],[68,100],[55,130],[53,140],[47,140],[42,130],[35,120],[25,120],[15,108],[5,103],[1,104],[-8,115],[-8,115],[5,103],[15,108],[25,120],[35,120],[42,130],[53,141],[60,141],[68,160],[70,160],[72,140],[75,120],[78,100],[77,80],[75,60],[72,52],[70,30]],
+    // North America
+    [[70,-141],[70,-100],[70,-80],[65,-70],[60,-64],[55,-60],[50,-55],[45,-60],[42,-70],[40,-74],[35,-75],[30,-80],[25,-80],[20,-87],[15,-85],[10,-83],[8,-77],[8,-75],[10,-63],[15,-61],[25,-77],[30,-81],[35,-76],[40,-72],[45,-60],[50,-55],[55,-60],[60,-64],[65,-70],[70,-80],[75,-100],[75,-120],[70,-135],[70,-141]],
+    // South America
+    [[10,-62],[8,-60],[4,-52],[0,-50],[-5,-35],[-10,-37],[-15,-39],[-22,-43],[-30,-50],[-35,-57],[-55,-68],[-55,-66],[-50,-73],[-45,-73],[-40,-62],[-35,-57],[-30,-50],[-22,-43],[-15,-39],[-10,-37],[-5,-35],[0,-50],[4,-52],[8,-60],[10,-62]],
+    // Australia
+    [[-15,130],[-12,136],[-12,142],[-18,148],[-25,152],[-35,150],[-38,146],[-38,140],[-35,136],[-32,133],[-30,114],[-22,113],[-15,130]],
+  ];
+
+  const contPaths=continents.map(pts=>{
+    const d=pts.map((p,i)=>{const[x,y]=px(p[0],p[1]);return(i===0?'M':'L')+x+' '+y;}).join(' ')+'Z';
+    return`<path d="${d}"/>`;
+  }).join('');
+
+  // Grid
+  let grid='';
   for(let lng=-180;lng<=180;lng+=30){
-    const[x1,y1]=project(80,lng);
-    const[x2,y2]=project(-55,lng);
-    gridLines+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    const[x1,y1]=px(78,lng);const[x2,y2]=px(-50,lng);
+    grid+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
   }
-  for(let lat=-55;lat<=80;lat+=20){
-    let pts=[];
-    for(let lng=-180;lng<=180;lng+=5)pts.push(project(lat,lng).join(','));
-    gridLines+=`<polyline points="${pts.join(' ')}"/>`;
+  for(let lat=-50;lat<=78;lat+=20){
+    const pts=[];for(let lng=-180;lng<=180;lng+=10)pts.push(px(lat,lng).join(','));
+    grid+=`<polyline points="${pts.join(' ')}"/>`;
   }
 
-  // Venue dots
+  // Venue dots + glows
   let dots='';
-  TOUR_VENUES.forEach((v,i)=>{
-    const[x,y]=project(v.lat,v.lng);
-    const color=v.status==='upcoming'?'#e61e2a':v.status==='sold-out'?'#c8a84b':'rgba(255,255,255,0.4)';
-    const r=v.status==='upcoming'?6:4;
+  TOUR_VENUES.forEach(v=>{
+    const[x,y]=px(v.lat,v.lng);
     if(v.status==='upcoming'){
-      dots+=`<circle cx="${x}" cy="${y}" r="14" fill="rgba(230,30,42,0.2)"/>`;
-      dots+=`<circle cx="${x}" cy="${y}" r="9" fill="rgba(230,30,42,0.15)"/>`;
+      dots+=`<circle cx="${x}" cy="${y}" r="16" fill="rgba(230,30,42,0.15)"/>`;
+      dots+=`<circle cx="${x}" cy="${y}" r="9" fill="rgba(230,30,42,0.25)"/>`;
+      dots+=`<circle cx="${x}" cy="${y}" r="5" fill="#e61e2a"/>`;
+    } else if(v.status==='sold-out'){
+      dots+=`<circle cx="${x}" cy="${y}" r="4" fill="#c8a84b"/>`;
+    } else {
+      dots+=`<circle cx="${x}" cy="${y}" r="3" fill="rgba(255,255,255,0.4)"/>`;
     }
-    dots+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" ${v.status==='upcoming'?'filter="url(#glow)"':''}/>`;
   });
 
-  wrap.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;border-radius:12px">
-    <defs>
-      <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    </defs>
-    <rect width="${W}" height="${H}" fill="#1a2433" rx="12"/>
-    <g stroke="rgba(255,255,255,0.06)" stroke-width="0.5" fill="none">${gridLines}</g>
+  wrap.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+    <rect width="${W}" height="${H}" fill="#111d2e"/>
+    <g stroke="rgba(255,255,255,0.05)" stroke-width="0.5" fill="none">${grid}</g>
+    <g fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5">${contPaths}</g>
     ${dots}
-    <text x="12" y="${H-12}" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="rgba(255,255,255,0.25)">POWER UP WORLD TOUR 2024–2026</text>
+    <text x="14" y="${H-14}" font-family="Barlow Condensed,sans-serif" font-size="13" font-weight="700" letter-spacing="2.5" fill="rgba(255,255,255,0.22)">POWER UP WORLD TOUR 2024–2026</text>
   </svg>`;
 }
 
