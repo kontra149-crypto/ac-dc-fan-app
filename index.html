@@ -596,8 +596,10 @@ function toggleKeyVisibility(){
   else{input.type='password';btn.textContent='👁️';}
 }
 // Schließen wenn außerhalb geklickt
-document.getElementById('settings-overlay').addEventListener('click',function(e){
-  if(e.target===this)closeSettings();
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('settings-overlay').addEventListener('click',function(e){
+    if(e.target===this)closeSettings();
+  });
 });
   const k=document.getElementById('apikey-input').value.trim();
   if(!k.startsWith('sk-ant')){alert('Ungültiger Key – muss mit sk-ant beginnen.');return;}
