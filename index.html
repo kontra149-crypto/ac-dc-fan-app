@@ -252,6 +252,51 @@ body.light .ai-sug{background:rgba(0,0,0,.04)}
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+
+/* ── SEARCH ── */
+.search-wrap{position:relative;margin-bottom:14px}
+.search-input{width:100%;padding:13px 15px 13px 42px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:15px;outline:none;transition:all .2s}
+body.light .search-input{background:rgba(0,0,0,.04)}
+.search-input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(230,30,42,.1)}
+.search-input::placeholder{color:var(--hint)}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.search-results{margin-top:4px}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all .2s}
+.search-result-item:active{background:var(--surface2);border-color:rgba(230,30,42,.3)}
+.search-result-icon{font-size:22px;flex-shrink:0}
+.search-result-info{flex:1;min-width:0}
+.search-result-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.search-result-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.search-result-badge{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);background:rgba(230,30,42,.1);border:1px solid rgba(230,30,42,.2);padding:3px 8px;border-radius:10px;flex-shrink:0}
+.search-empty{text-align:center;padding:32px 0;color:var(--muted);font-size:13px}
+
+/* ── HIGHSCORE ── */
+.hs-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;transition:all .2s}
+.hs-rank{font-family:'Bebas Neue',sans-serif;font-size:22px;width:28px;text-align:center;flex-shrink:0;color:var(--muted)}
+.hs-rank.gold{color:#c8a84b}
+.hs-rank.silver{color:#a0a8b0}
+.hs-rank.bronze{color:#b87040}
+.hs-name{flex:1;font-size:14px;font-weight:700;letter-spacing:.3px}
+.hs-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red);letter-spacing:1px}
+.hs-date{font-size:9px;color:var(--hint);letter-spacing:.5px;margin-top:1px}
+.hs-me{border-color:rgba(230,30,42,.4);background:rgba(230,30,42,.04)}
+
+/* ── TOUR MAP ── */
+.tour-map-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:14px;background:var(--surface2);position:relative}
+.tour-map-inner{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:#1a2433}
+.tour-venue-list{display:flex;flex-direction:column;gap:8px}
+.tour-venue{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
+.tour-venue:active{background:var(--surface2);border-color:rgba(230,30,42,.3)}
+.tour-venue.active-venue{border-color:var(--red);background:rgba(230,30,42,.06)}
+.tour-venue-dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:4px;box-shadow:0 0 8px var(--red-glow)}
+.tour-venue-dot.past{background:var(--muted);box-shadow:none}
+.tour-venue-info{flex:1}
+.tour-venue-name{font-size:14px;font-weight:700;letter-spacing:.3px}
+.tour-venue-detail{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.tour-venue-status{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;flex-shrink:0}
+.status-upcoming{color:#3fcc6a;background:rgba(63,204,106,.1);border:1px solid rgba(63,204,106,.25)}
+.status-past{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+.status-sold-out{color:#c8a84b;background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25)}
 </style>
 </head>
 <body>
@@ -263,6 +308,7 @@ body.light .ai-sug{background:rgba(0,0,0,.04)}
     <span class="logo-text">High Voltage</span>
   </div>
   <div class="topbar-actions">
+    <button class="icon-btn" id="search-btn" onclick="toggleSearch()" title="Suche">🔍</button>
     <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Theme">🌙</button>
     <button class="icon-btn" onclick="openSettings()" title="Einstellungen" id="settings-btn">⚙️</button>
   </div>
@@ -358,6 +404,41 @@ body.light .ai-sug{background:rgba(0,0,0,.04)}
     </div>
   </div>
 
+  <!-- TOUR MAP -->
+  <div id="page-tour" class="page">
+    <div class="sec-title">World Tour</div>
+    <div class="sec-sub">⚡ Power Up Tour 2024–2026</div>
+    <div class="tour-map-wrap">
+      <canvas id="tour-canvas" style="width:100%;display:block"></canvas>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:14px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;box-shadow:0 0 6px var(--red-glow)"></span>Upcoming</span>
+      <span style="display:flex;align-items:center;gap:5px;color:var(--muted)"><span style="width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block"></span>Gespielt</span>
+      <span style="display:flex;align-items:center;gap:5px;color:#c8a84b"><span style="width:9px;height:9px;border-radius:50%;background:#c8a84b;display:inline-block"></span>Ausverkauft</span>
+    </div>
+    <div class="tour-venue-list" id="tour-venue-list"></div>
+  </div>
+
+  <!-- HIGHSCORE -->
+  <div id="page-highscore" class="page">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div class="sec-title">Highscores</div>
+        <div class="sec-sub">⚡ Hall of Fame</div>
+      </div>
+      <button class="btn btn-ghost" onclick="resetHighscore()" style="font-size:10px;padding:8px 14px">🗑️ Reset</button>
+    </div>
+    <div id="hs-save-box" class="card" style="margin-bottom:16px;display:none">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:var(--red);margin-bottom:8px">⚡ Score sichern</div>
+      <input class="field" id="hs-name-input" placeholder="Dein Name" maxlength="20" style="margin-bottom:10px">
+      <button class="btn btn-red" style="width:100%;justify-content:center" onclick="saveHighscore()">🏆 Eintragen</button>
+    </div>
+    <div id="hs-list"></div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-ghost" onclick="showTab('quiz')" style="font-size:10px">⚡ Zurück zum Quiz</button>
+    </div>
+  </div>
+
   <!-- KI CHAT -->
   <div id="page-ki" class="page">
     <div style="text-align:center;margin-bottom:20px">
@@ -392,13 +473,13 @@ body.light .ai-sug{background:rgba(0,0,0,.04)}
     <span class="bnav-icon">💿</span>
     <span class="bnav-label">Alben</span>
   </button>
-  <button class="bnav-btn" id="bnav-history" onclick="showTab('history')">
-    <span class="bnav-icon">📖</span>
-    <span class="bnav-label">Geschichte</span>
-  </button>
   <button class="bnav-btn" id="bnav-quiz" onclick="showTab('quiz')">
     <span class="bnav-icon">⚡</span>
     <span class="bnav-label">Quiz</span>
+  </button>
+  <button class="bnav-btn" id="bnav-tour" onclick="showTab('tour')">
+    <span class="bnav-icon">🌍</span>
+    <span class="bnav-label">Tour</span>
   </button>
   <button class="bnav-btn" id="bnav-wall" onclick="showTab('wall')">
     <span class="bnav-icon">📣</span>
@@ -430,6 +511,23 @@ body.light .ai-sug{background:rgba(0,0,0,.04)}
     <div class="mini-prog"><div class="mini-bar" id="mini-bar"></div></div>
   </div>
   <button class="mini-stop" onclick="stopAudio()" title="Stoppen">■</button>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div id="search-overlay" style="display:none;position:fixed;inset:0;z-index:997;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:calc(var(--safe-top) + 60px) 16px 24px;overflow-y:auto">
+  <div style="max-width:540px;margin:0 auto">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="search-input" placeholder="Alben, Songs, Geschichte..." oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div id="search-results" class="search-results">
+      <div class="search-empty" style="margin-top:40px">
+        <div style="font-size:32px;margin-bottom:12px">🎸</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px">Suchst du was?</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Alben, Songs, Bandgeschichte...</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- SETTINGS OVERLAY -->
@@ -601,6 +699,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(e.target===this)closeSettings();
   });
 });
+function confirmApiKey(){
   const k=document.getElementById('apikey-input').value.trim();
   if(!k.startsWith('sk-ant')){alert('Ungültiger Key – muss mit sk-ant beginnen.');return;}
   saveApiKey(k);
@@ -659,10 +758,10 @@ function toggleTheme(){
 
 // ── NAVIGATION ──────────────────────────────────────────
 function showTab(tab){
-  // hide all pages
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+tab).classList.add('active');
+  const page=document.getElementById('page-'+tab);
+  if(page)page.classList.add('active');
   const btn=document.getElementById('bnav-'+tab);
   if(btn)btn.classList.add('active');
   document.getElementById('scroll-area').scrollTop=0;
@@ -672,6 +771,8 @@ function showTab(tab){
   if(tab==='history'&&!document.getElementById('timeline').innerHTML){renderHistory();renderConcerts();}
   if(tab==='quiz'&&!quizLoaded){loadQuiz();}
   if(tab==='wall'){renderWall();}
+  if(tab==='tour'){renderTourVenues();setTimeout(drawTourMap,80);}
+  if(tab==='highscore'){renderHighscores();}
 }
 
 // ── VIDEO ───────────────────────────────────────────────
@@ -1027,6 +1128,250 @@ function askSug(btn){
   document.getElementById('ai-input').value=btn.textContent;
   sendAI();
 }
+
+// ── SEARCH ────────────────────────────────────────────────
+function toggleSearch(){
+  const overlay=document.getElementById('search-overlay');
+  const isOpen=overlay.style.display==='block';
+  overlay.style.display=isOpen?'none':'block';
+  if(!isOpen){
+    setTimeout(()=>document.getElementById('search-input').focus(),100);
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('search-overlay').style.display='none';});
+
+function doSearch(q){
+  const res=document.getElementById('search-results');
+  q=q.trim().toLowerCase();
+  if(!q){
+    res.innerHTML='<div class="search-empty" style="margin-top:40px"><div style="font-size:32px;margin-bottom:12px">🎸</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:2px">Suchst du was?</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Alben, Songs, Bandgeschichte...</div></div>';
+    return;
+  }
+  const hits=[];
+  // Albums
+  ALBUMS.forEach((a,i)=>{
+    if(a.title.toLowerCase().includes(q)||String(a.year).includes(q)||a.desc.toLowerCase().includes(q)){
+      hits.push({type:'Album',icon:a.icon,title:a.title,sub:a.year+' · '+a.desc,action:`closeSearchAndGo('alben',${i})`});
+    }
+    // Songs
+    a.tracks.forEach(t=>{
+      if(t.toLowerCase().includes(q)){
+        hits.push({type:'Song',icon:'🎵',title:t,sub:'Album: '+a.title+' ('+a.year+')',action:`closeSearchAndGo('alben',${i})`});
+      }
+    });
+  });
+  // History
+  HISTORY_DATA.forEach(h=>{
+    if(h.title.toLowerCase().includes(q)||h.desc.toLowerCase().includes(q)||h.year.includes(q)){
+      hits.push({type:'Geschichte',icon:'📖',title:h.year+' – '+h.title,sub:h.desc.slice(0,60)+'…',action:"closeSearchAndGo('history',-1)"});
+    }
+  });
+  // Concerts
+  CONCERTS.forEach(c=>{
+    if(c.name.toLowerCase().includes(q)||String(c.year).includes(q)||c.desc.toLowerCase().includes(q)){
+      hits.push({type:'Konzert',icon:'🎤',title:c.name,sub:c.year+' · '+c.desc.slice(0,50)+'…',action:"closeSearchAndGo('history',-1)"});
+    }
+  });
+  if(!hits.length){
+    res.innerHTML='<div class="search-empty"><div style="font-size:28px;margin-bottom:10px">🤷</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px">Nichts gefunden</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Versuch einen anderen Begriff</div></div>';
+    return;
+  }
+  res.innerHTML=hits.slice(0,20).map(h=>`
+    <div class="search-result-item" onclick="${h.action}">
+      <span class="search-result-icon">${h.icon}</span>
+      <div class="search-result-info">
+        <div class="search-result-title">${h.title}</div>
+        <div class="search-result-sub">${h.sub}</div>
+      </div>
+      <span class="search-result-badge">${h.type}</span>
+    </div>`).join('');
+}
+function closeSearchAndGo(tab,albumIdx){
+  document.getElementById('search-overlay').style.display='none';
+  showTab(tab);
+  if(albumIdx>=0)setTimeout(()=>openAlbum(albumIdx),200);
+}
+
+// ── HIGHSCORE ─────────────────────────────────────────────
+function getHighscores(){
+  try{return JSON.parse(localStorage.getItem('acdc-highscores')||'[]');}catch{return [];}
+}
+function renderHighscores(){
+  const list=document.getElementById('hs-list');
+  const scores=getHighscores();
+  const rankClass=i=>i===0?'gold':i===1?'silver':i===2?'bronze':'';
+  const savedName=localStorage.getItem('acdc-hs-myname')||'';
+  if(!scores.length){
+    list.innerHTML='<div class="search-empty"><div style="font-size:32px;margin-bottom:10px">🏆</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;letter-spacing:2px">Noch keine Scores</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Mach das Quiz und trag dich ein!</div></div>';
+    return;
+  }
+  list.innerHTML=scores.map((s,i)=>`
+    <div class="hs-row${s.name===savedName?' hs-me':''}">
+      <div class="hs-rank ${rankClass(i)}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</div>
+      <div>
+        <div class="hs-name">${s.name}${s.name===savedName?' 👈':''}</div>
+        <div class="hs-date">${s.date}</div>
+      </div>
+      <div class="hs-score">${s.score} Pts</div>
+    </div>`).join('');
+}
+function showHighscoreTab(){
+  // Check if current score is worth saving
+  const scores=getHighscores();
+  const box=document.getElementById('hs-save-box');
+  const savedName=localStorage.getItem('acdc-hs-myname')||'';
+  const myBest=scores.find(s=>s.name===savedName);
+  if(triviaScore>0&&(!myBest||triviaScore>myBest.score)){
+    box.style.display='block';
+    document.getElementById('hs-name-input').value=savedName;
+  } else {
+    box.style.display='none';
+  }
+  renderHighscores();
+  showTab('highscore');
+}
+function saveHighscore(){
+  const name=document.getElementById('hs-name-input').value.trim();
+  if(!name){alert('Bitte Name eingeben!');return;}
+  localStorage.setItem('acdc-hs-myname',name);
+  let scores=getHighscores().filter(s=>s.name!==name);
+  const now=new Date();
+  scores.push({name,score:triviaScore,date:now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'})});
+  scores.sort((a,b)=>b.score-a.score);
+  scores=scores.slice(0,20);
+  localStorage.setItem('acdc-highscores',JSON.stringify(scores));
+  document.getElementById('hs-save-box').style.display='none';
+  renderHighscores();
+}
+function resetHighscore(){
+  if(!confirm('Alle Highscores löschen?'))return;
+  localStorage.removeItem('acdc-highscores');
+  renderHighscores();
+}
+
+// ── TOUR MAP ──────────────────────────────────────────────
+const TOUR_VENUES=[
+  {name:'Olympiastadion Berlin',city:'Berlin, Deutschland',date:'18. Mai 2024',lat:52.51,lng:13.24,status:'past',fans:'70.000'},
+  {name:'Olympiastadion München',city:'München, Deutschland',date:'22. Mai 2024',lat:48.17,lng:11.55,status:'past',fans:'69.000'},
+  {name:'Wembley Stadium',city:'London, UK',date:'1. Jul 2024',lat:51.556,lng:-0.279,status:'past',fans:'87.000'},
+  {name:'Stade de France',city:'Paris, Frankreich',date:'13. Jul 2024',lat:48.924,lng:2.360,status:'past',fans:'80.000'},
+  {name:'Johan Cruyff Arena',city:'Amsterdam, Niederlande',date:'20. Jul 2024',lat:52.314,lng:4.941,status:'sold-out',fans:'54.000'},
+  {name:'Ullevi Stadium',city:'Göteborg, Schweden',date:'3. Aug 2024',lat:57.707,lng:11.986,status:'past',fans:'55.000'},
+  {name:'MetLife Stadium',city:'New Jersey, USA',date:'6. Sep 2024',lat:40.813,lng:-74.074,status:'past',fans:'82.000'},
+  {name:'Levi\'s Stadium',city:'Santa Clara, USA',date:'14. Sep 2024',lat:37.403,lng:-121.970,status:'past',fans:'68.000'},
+  {name:'Forsyth Barr Stadium',city:'Dunedin, Neuseeland',date:'15. Feb 2025',lat:-45.876,lng:170.503,status:'past',fans:'31.000'},
+  {name:'Marvel Stadium',city:'Melbourne, Australien',date:'22. Feb 2025',lat:-37.816,lng:144.947,status:'past',fans:'53.000'},
+  {name:'Estadio Nacional',city:'Santiago, Chile',date:'10. Apr 2025',lat:-33.464,lng:-70.634,status:'past',fans:'47.000'},
+  {name:'Estadio River Plate',city:'Buenos Aires, Argentinien',date:'18. Apr 2025',lat:-34.546,lng:-58.450,status:'sold-out',fans:'84.000'},
+  {name:'Signal Iduna Park',city:'Dortmund, Deutschland',date:'19. Jun 2025',lat:51.493,lng:7.452,status:'upcoming',fans:'81.000'},
+  {name:'Volksparkstadion',city:'Hamburg, Deutschland',date:'22. Jun 2025',lat:53.587,lng:9.899,status:'upcoming',fans:'57.000'},
+  {name:'Murrayfield Stadium',city:'Edinburgh, UK',date:'3. Aug 2025',lat:55.946,lng:-3.241,status:'upcoming',fans:'67.000'},
+  {name:'Croke Park',city:'Dublin, Irland',date:'10. Aug 2025',lat:53.360,lng:-6.251,status:'upcoming',fans:'82.000'},
+];
+
+function drawTourMap(){
+  const canvas=document.getElementById('tour-canvas');
+  if(!canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||350;
+  const H=Math.round(W*0.56);
+  canvas.width=W*dpr;
+  canvas.height=H*dpr;
+  canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  // Background
+  ctx.fillStyle='#1a2433';
+  ctx.fillRect(0,0,W,H);
+
+  // Simple world map silhouette (rough polygons for continents)
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.lineWidth=0.5;
+
+  // Mercator projection
+  function project(lat,lng){
+    const x=(lng+180)/(360)*W;
+    const latR=lat*Math.PI/180;
+    const y=(Math.PI-Math.log(Math.tan(Math.PI/4+latR/2)))/(2*Math.PI)*H;
+    return[x,y];
+  }
+
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.04)';
+  ctx.lineWidth=0.5;
+  for(let lng=-180;lng<=180;lng+=30){
+    const[x1]=project(85,lng);
+    const[x2,y2]=project(-60,lng);
+    ctx.beginPath();ctx.moveTo(x1,project(85,lng)[1]);ctx.lineTo(x2,y2);ctx.stroke();
+  }
+  for(let lat=-60;lat<=85;lat+=20){
+    ctx.beginPath();
+    for(let lng=-180;lng<=180;lng+=5){
+      const[x,y]=project(lat,lng);
+      lng===-180?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+
+  // Draw venue dots
+  TOUR_VENUES.forEach(v=>{
+    const[x,y]=project(v.lat,v.lng);
+    const color=v.status==='upcoming'?'#e61e2a':v.status==='sold-out'?'#c8a84b':'rgba(255,255,255,0.35)';
+    // Glow for upcoming
+    if(v.status==='upcoming'){
+      const g=ctx.createRadialGradient(x,y,0,x,y,10);
+      g.addColorStop(0,'rgba(230,30,42,0.4)');
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;
+      ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();
+    }
+    ctx.fillStyle=color;
+    ctx.beginPath();ctx.arc(x,y,v.status==='upcoming'?5:3.5,0,Math.PI*2);ctx.fill();
+  });
+
+  // Label
+  ctx.fillStyle='rgba(255,255,255,0.2)';
+  ctx.font='700 8px Barlow Condensed, sans-serif';
+  ctx.letterSpacing='2px';
+  ctx.fillText('POWER UP WORLD TOUR 2024–2026',10,H-10);
+}
+
+function renderTourVenues(){
+  const list=document.getElementById('tour-venue-list');
+  if(!list)return;
+  list.innerHTML=TOUR_VENUES.map((v)=>{
+    const statusLabel=v.status==='upcoming'?'Upcoming':v.status==='sold-out'?'Ausverkauft':'Gespielt';
+    const statusClass=v.status==='upcoming'?'status-upcoming':v.status==='sold-out'?'status-sold-out':'status-past';
+    const dotClass=v.status==='past'?'past':'';
+    return`<div class="tour-venue">
+      <div class="tour-venue-dot ${dotClass}"></div>
+      <div class="tour-venue-info">
+        <div class="tour-venue-name">${v.name}</div>
+        <div class="tour-venue-detail">${v.city} · ${v.date} · ${v.fans} Fans</div>
+      </div>
+      <span class="tour-venue-status ${statusClass}">${statusLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PATCH QUIZ to show highscore button ──────────────────
+const _origAnswerQuiz=answerQuiz;
+answerQuiz=function(btn){
+  _origAnswerQuiz(btn);
+  setTimeout(()=>{
+    const card=document.getElementById('quiz-card');
+    if(card&&!card.querySelector('.hs-btn')){
+      const hsBtn=document.createElement('button');
+      hsBtn.className='btn btn-ghost hs-btn';
+      hsBtn.style.cssText='width:100%;justify-content:center;margin-top:8px;font-size:10px';
+      hsBtn.innerHTML='🏆 Highscore – Mein Score: '+triviaScore+' Pts';
+      hsBtn.onclick=showHighscoreTab;
+      card.appendChild(hsBtn);
+    }
+  },100);
+};
 
 // ── INIT ────────────────────────────────────────────────
 renderNews(NEWS_DEFAULT);
